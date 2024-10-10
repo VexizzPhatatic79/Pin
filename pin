@@ -55,7 +55,7 @@ local function passBombToPlayer()
             local bomb = character:FindFirstChild("Bomb")
             if bomb then
                 bomb.Parent = closestPlayer.Backpack
-                bombHolder = closestPlayer
+                bombHolder = closestPlayer -- Update bombHolder to the new player
                 alertLabel.Text = "" -- Hide alert
                 alertLabel.Visible = false
                 hasBomb = false
