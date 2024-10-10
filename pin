@@ -59,13 +59,14 @@ local function passBombToPlayer()
         local closestPlayer = getClosestPlayer()
         if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
             -- Transfer the bomb
-            local bomb = character:FindFirstChild("Bomb")
+            local bomb = player.Backpack:FindFirstChild("Bomb")
             if bomb then
                 bomb.Parent = closestPlayer.Backpack
                 bombHolder = closestPlayer -- Update bombHolder to the new player
                 alertLabel.Text = "" -- Hide alert
                 alertLabel.Visible = false
                 hasBomb = false
+                throwButton.Visible = false -- Hide the button after passing the bomb
             end
         end
     end
