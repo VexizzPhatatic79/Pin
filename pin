@@ -48,8 +48,8 @@ local function throwBoom()
             local bomb = character:FindFirstChild("Bomb") or player.Backpack:FindFirstChild("Bomb")
             if bomb then
                 -- Move Bomb to the closest player
-                bomb.Parent = closestPlayer.Character
-                bomb.CFrame = closestPlayer.Character.HumanoidRootPart.CFrame
+                bomb.Parent = closestPlayer.Backpack -- Move bomb to their Backpack (not character)
+                bomb.CFrame = closestPlayer.Character.HumanoidRootPart.CFrame -- Teleport bomb to the player
 
                 -- Update the hasBomb flag
                 hasBomb = false
