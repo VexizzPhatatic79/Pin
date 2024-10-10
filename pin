@@ -2,41 +2,52 @@
 
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local isThrowEnabled = false
+local originalPosition = nil -- Store original position when throw starts
 local hasBomb = false -- Flag to check if player has the bomb
-local bombHolder = nil -- To keep track of who has the bomb
-local bombTime = 10 -- Time before the bomb explodes (in seconds)
 
 -- UI setup
 local screenGui = Instance.new("ScreenGui", player.PlayerGui)
 
--- Title setup (Phoela)
+-- Title setup
 local titleLabel = Instance.new("TextLabel", screenGui)
-titleLabel.Position = UDim2.new(0.5, -100, 0, 10) -- Centered at top
-titleLabel.Size = UDim2.new(0, 200, 0, 50)
-titleLabel.Text = "Phoela"
+titleLabel.Position = UDim2.new(0.5, -50, 0, 10) -- Position of the title
+titleLabel.Size = UDim2.new(0, 100, 0, 50) -- Size of the title
+titleLabel.Text = "Phoela" -- Title text
+titleLabel.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
 titleLabel.TextColor3 = Color3.new(1, 1, 1) -- White text
-titleLabel.BackgroundTransparency = 1 -- Transparent background
-titleLabel.Font = Enum.Font.SourceSansBold
-titleLabel.TextScaled = true
 
--- Alert setup
-local alertLabel = Instance.new("TextLabel", screenGui)
-alertLabel.Position = UDim2.new(0.5, -100, 0.5, 0)
-alertLabel.Size = UDim2.new(0, 200, 0, 50)
-alertLabel.Text = ""
-alertLabel.TextColor3 = Color3.new(1, 0, 0) -- Red text for alert
-alertLabel.BackgroundTransparency = 1
-alertLabel.Font = Enum.Font.SourceSansBold
-alertLabel.TextScaled = true
-alertLabel.Visible = false -- Hidden initially
+-- Enable Button setup
+local enableButton = Instance.new("TextButton", screenGui)
+enableButton.Position = UDim2.new(0.5, -25, 0, 70)
+enableButton.Size = UDim2.new(0, 50, 0, 25)
+enableButton.Text = "ဖွင့်မည်"
+enableButton.BackgroundColor3 = Color3.new(0, 1, 0) -- Green
+
+-- Disable Button setup
+local disableButton = Instance.new("TextButton", screenGui)
+disableButton.Position = UDim2.new(0.5, -25, 0, 110)
+disableButton.Size = UDim2.new(0, 50, 0, 25)
+disableButton.Text = "ပိတ်မည်"
+disableButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
+disableButton.Visible = false -- Hide the disable button initially
 
 -- Throw Button setup
 local throwButton = Instance.new("TextButton", screenGui)
-throwButton.Position = UDim2.new(0.5, -50, 0.6, 0)
-throwButton.Size = UDim2.new(0, 100, 0, 50)
+throwButton.Position = UDim2.new(0.5, -25, 0, 150)
+throwButton.Size = UDim2.new(0, 50, 0, 25)
 throwButton.Text = "ပစ်မည်"
 throwButton.BackgroundColor3 = Color3.new(1, 1, 0) -- Yellow
-throwButton.Visible = false -- Hidden initially
+throwButton.Visible = false -- Hide initially, show only when enabled
+
+-- Alert Button setup
+local alertButton = Instance.new("TextButton", screenGui)
+alertButton.Position = UDim2.new(0.5, -25, 0, 190)
+alertButton.Size = UDim2.new(0, 150, 0, 25)
+alertButton.Text = ""
+alertButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
+alertButton.Visible = false -- Initially hidden
 
 -- Function to find the closest player
 local function getClosestPlayer()
@@ -45,7 +56,7 @@ local function getClosestPlayer()
 
     for _, otherPlayer in pairs(game.Players:GetPlayers()) do
         if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local distance = (character.HumanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
+            local distance = (humanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
             if distance < minDistance then
                 minDistance = distance
                 closestPlayer = otherPlayer
@@ -55,66 +66,67 @@ local function getClosestPlayer()
     return closestPlayer
 end
 
--- Function to pass the bomb to the closest player
-local function passBombToPlayer()
-    if hasBomb then
+-- Function to throw the Bomb at the closest player
+local function boomThrow()
+    if isThrowEnabled and hasBomb then
         local closestPlayer = getClosestPlayer()
         if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            -- Transfer the bomb
-            local bomb = player.Backpack:FindFirstChild("Bomb")
-            if bomb then
-                bomb.Parent = closestPlayer.Backpack
-                bombHolder = closestPlayer -- Update bombHolder to the new player
-                alertLabel.Text = "" -- Hide alert
-                alertLabel.Visible = false
-                hasBomb = false
-                throwButton.Visible = false -- Hide the button after passing the bomb
+            -- Move to the closest player's position and throw
+            humanoidRootPart.CFrame = CFrame.new(closestPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0))
+
+            -- Adjust the actual throwing logic here
+            local throwEvent = game.ReplicatedStorage:FindFirstChild("ThrowEvent") -- Ensure the event is correct
+            if throwEvent then
+                throwEvent:FireServer(closestPlayer.Character) -- Fire the event towards the closest player
             end
+
+            -- Show alert only if the player has the Bomb
+            alertButton.Text = "ဗုံးရနေပါပြီ!" -- Alert message
+            alertButton.Visible = true -- Show alert
+
+            -- Hide the alert after the Bomb is thrown
+            wait(2) -- Wait for 2 seconds before hiding the alert
+            alertButton.Visible = false -- Hide the alert
         end
     end
 end
 
--- Function to handle bomb timer
-local function startBombTimer()
-    while hasBomb do
-        wait(1)
-        bombTime = bombTime - 1
-        if bombTime <= 0 then
-            -- Bomb explodes if time runs out
-            if bombHolder == player then
-                character.Humanoid:TakeDamage(character.Humanoid.MaxHealth) -- Kill the player with the bomb
-            end
-            hasBomb = false
-            break
-        end
+-- Enable Button functionality
+enableButton.MouseButton1Click:Connect(function()
+    isThrowEnabled = true
+    enableButton.Visible = false
+    disableButton.Visible = true
+    throwButton.Visible = true
+end)
+
+-- Disable Button functionality
+disableButton.MouseButton1Click:Connect(function()
+    isThrowEnabled = false
+    enableButton.Visible = true
+    disableButton.Visible = false
+    throwButton.Visible = false
+end)
+
+-- Throw Button functionality
+throwButton.MouseButton1Click:Connect(function()
+    if isThrowEnabled then
+        boomThrow() -- Call the throw function when the button is clicked
     end
-end
+end)
 
 -- Function to detect Bomb being added to player's inventory
 player.Backpack.ChildAdded:Connect(function(child)
-    if child.Name == "Bomb" then
-        hasBomb = true
-        bombHolder = player
-        alertLabel.Text = "ဗုံးရနေပါပြီ!"
-        alertLabel.Visible = true
-        bombTime = 10 -- Reset bomb timer
-        startBombTimer()
-        throwButton.Visible = true -- Show the throw button when player gets the bomb
+    if child.Name == "Bomb" then -- Change "Bomb" to the actual name of the Bomb Object
+        hasBomb = true -- Set the flag to true when Bomb is received
+        alertButton.Text = "ဗုံးရနေပါပြီ!" -- Show alert message
+        alertButton.Visible = true -- Show the alert button
     end
 end)
 
 -- Function to detect Bomb being removed from player's inventory
 player.Backpack.ChildRemoved:Connect(function(child)
-    if child.Name == "Bomb" then
-        hasBomb = false
-        alertLabel.Visible = false -- Hide the alert if Bomb is removed
-        throwButton.Visible = false -- Hide the throw button if Bomb is removed
-    end
-end)
-
--- Button to throw the bomb to the closest player
-throwButton.MouseButton1Click:Connect(function()
-    if hasBomb then
-        passBombToPlayer()
+    if child.Name == "Bomb" then -- Change "Bomb" to the actual name of the Bomb Object
+        hasBomb = false -- Set the flag to false when Bomb is removed
+        alertButton.Visible = false -- Hide the alert if Bomb is removed
     end
 end)
