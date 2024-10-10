@@ -71,22 +71,23 @@ local function boomThrow()
     if isThrowEnabled and hasBomb then
         local closestPlayer = getClosestPlayer()
         if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            -- Move to the closest player's position and throw
-            humanoidRootPart.CFrame = CFrame.new(closestPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0))
+            -- Move the bomb to the closest player's position
+            local bomb = player.Backpack:FindFirstChild("Bomb") or character:FindFirstChild("Bomb")
+            if bomb then
+                bomb.Parent = closestPlayer.Character -- Move the bomb to the closest player
+                bomb.CFrame = closestPlayer.Character.HumanoidRootPart.CFrame -- Set bomb's position to the closest player
+                hasBomb = false -- Player no longer has the bomb
 
-            -- Adjust the actual throwing logic here
-            local throwEvent = game.ReplicatedStorage:FindFirstChild("ThrowEvent") -- Ensure the event is correct
-            if throwEvent then
-                throwEvent:FireServer(closestPlayer.Character) -- Fire the event towards the closest player
+                -- Show alert that bomb has been thrown
+                alertButton.Text = "ဗုံးပျံသွားပြီ!"
+                alertButton.Visible = true
+
+                -- Hide the alert after 2 seconds
+                wait(2)
+                alertButton.Visible = false
+            else
+                print("No bomb found in player's inventory.")
             end
-
-            -- Show alert only if the player has the Bomb
-            alertButton.Text = "ဗုံးရနေပါပြီ!" -- Alert message
-            alertButton.Visible = true -- Show alert
-
-            -- Hide the alert after the Bomb is thrown
-            wait(2) -- Wait for 2 seconds before hiding the alert
-            alertButton.Visible = false -- Hide the alert
         end
     end
 end
