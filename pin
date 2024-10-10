@@ -1,6 +1,5 @@
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local hasBomb = false -- Flag to check if player has the bomb
 local bombHolder = nil -- To keep track of who has the bomb
 local bombTime = 10 -- Time before the bomb explodes (in seconds)
@@ -29,6 +28,14 @@ alertLabel.Font = Enum.Font.SourceSansBold
 alertLabel.TextScaled = true
 alertLabel.Visible = false -- Hidden initially
 
+-- Throw Button setup
+local throwButton = Instance.new("TextButton", screenGui)
+throwButton.Position = UDim2.new(0.5, -50, 0.6, 0)
+throwButton.Size = UDim2.new(0, 100, 0, 50)
+throwButton.Text = "ပစ်မည်"
+throwButton.BackgroundColor3 = Color3.new(1, 1, 0) -- Yellow
+throwButton.Visible = false -- Hidden initially
+
 -- Function to find the closest player
 local function getClosestPlayer()
     local closestPlayer = nil
@@ -36,7 +43,7 @@ local function getClosestPlayer()
 
     for _, otherPlayer in pairs(game.Players:GetPlayers()) do
         if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local distance = (humanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
+            local distance = (character.HumanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
             if distance < minDistance then
                 minDistance = distance
                 closestPlayer = otherPlayer
@@ -89,6 +96,7 @@ player.Backpack.ChildAdded:Connect(function(child)
         alertLabel.Visible = true
         bombTime = 10 -- Reset bomb timer
         startBombTimer()
+        throwButton.Visible = true -- Show the throw button when player gets the bomb
     end
 end)
 
@@ -97,32 +105,13 @@ player.Backpack.ChildRemoved:Connect(function(child)
     if child.Name == "Bomb" then
         hasBomb = false
         alertLabel.Visible = false -- Hide the alert if Bomb is removed
+        throwButton.Visible = false -- Hide the throw button if Bomb is removed
     end
 end)
 
 -- Button to throw the bomb to the closest player
-local throwButton = Instance.new("TextButton", screenGui)
-throwButton.Position = UDim2.new(0.5, -50, 0.6, 0)
-throwButton.Size = UDim2.new(0, 100, 0, 50)
-throwButton.Text = "ပစ်မည်"
-throwButton.BackgroundColor3 = Color3.new(1, 1, 0) -- Yellow
-throwButton.Visible = false -- Hidden initially
-
 throwButton.MouseButton1Click:Connect(function()
     if hasBomb then
         passBombToPlayer()
-    end
-end)
-
--- Show the button only when the player has the bomb
-player.Backpack.ChildAdded:Connect(function(child)
-    if child.Name == "Bomb" then
-        throwButton.Visible = true
-    end
-end)
-
-player.Backpack.ChildRemoved:Connect(function(child)
-    if child.Name == "Bomb" then
-        throwButton.Visible = false
     end
 end)
