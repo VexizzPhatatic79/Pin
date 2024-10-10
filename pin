@@ -1,3 +1,5 @@
+-- LocalScript
+
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local hasBomb = false -- Flag to check if player has the bomb
