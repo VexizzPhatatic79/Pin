@@ -16,7 +16,7 @@ local throwButton = Instance.new("TextButton", screenGui)
 title.Position = UDim2.new(0.5, -50, 0, 10)
 title.Size = UDim2.new(0, 100, 0, 30) -- Smaller size for title
 title.Text = "KhantKhant"
-title.TextColor3 = Color3.new(1, 1, 1) -- White text
+title.TextColor3 = Color3.new(1, 1, 0) -- Yellow text
 title.Font = Enum.Font.SourceSansBold -- Bold font
 title.BackgroundTransparency = 1 -- Remove background
 
@@ -35,12 +35,13 @@ disableButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
 disableButton.Draggable = true
 disableButton.Visible = false -- Hide the disable button initially
 
--- Throw Button setup (remove background, larger text)
+-- Throw Button setup (remove background, larger text, blue color)
 throwButton.Position = UDim2.new(0.5, -50, 0, 130)
 throwButton.Size = UDim2.new(0, 100, 0, 40) -- Larger size (100x40)
 throwButton.Text = "ပစ်မည်"
 throwButton.TextSize = 20 -- Increase text size
-throwButton.BackgroundTransparency = 1 -- Remove background
+throwButton.BackgroundColor3 = Color3.new(0, 0, 1) -- Blue background
+throwButton.BackgroundTransparency = 0 -- Remove background transparency
 throwButton.Draggable = true
 throwButton.Visible = false -- Hide initially, show only when enabled
 
