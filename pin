@@ -3,7 +3,7 @@ local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local isThrowEnabled = false
 local originalPosition = nil -- Store original position when throw starts
-local alertLabel = nil -- Label to show alert
+local alertButton = nil -- Button to show alert
 
 -- UI setup
 local screenGui = Instance.new("ScreenGui", player.PlayerGui)
@@ -16,9 +16,9 @@ local throwButton = Instance.new("TextButton", screenGui)
 title.Position = UDim2.new(0.5, -50, 0, 10)
 title.Size = UDim2.new(0, 100, 0, 30) -- Smaller size for title
 title.Text = "KhantKhant"
-title.BackgroundColor3 = Color3.new(0.5, 0.5, 0.5) -- Gray background
 title.TextColor3 = Color3.new(1, 1, 1) -- White text
 title.Font = Enum.Font.SourceSansBold -- Bold font
+title.BackgroundTransparency = 1 -- Remove background
 
 -- Enable Button setup (smaller size)
 enableButton.Position = UDim2.new(0.5, -25, 0, 50)
@@ -35,22 +35,26 @@ disableButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
 disableButton.Draggable = true
 disableButton.Visible = false -- Hide the disable button initially
 
--- Throw Button setup (smaller size)
-throwButton.Position = UDim2.new(0.5, -25, 0, 130)
-throwButton.Size = UDim2.new(0, 50, 0, 25) -- Smaller size (50x25)
+-- Throw Button setup (remove background, larger text)
+throwButton.Position = UDim2.new(0.5, -50, 0, 130)
+throwButton.Size = UDim2.new(0, 100, 0, 40) -- Larger size (100x40)
 throwButton.Text = "ပစ်မည်"
-throwButton.BackgroundColor3 = Color3.new(1, 1, 0) -- Yellow
+throwButton.TextSize = 20 -- Increase text size
+throwButton.BackgroundTransparency = 1 -- Remove background
 throwButton.Draggable = true
 throwButton.Visible = false -- Hide initially, show only when enabled
 
--- Alert Label setup
-alertLabel = Instance.new("TextLabel", screenGui)
-alertLabel.Position = UDim2.new(0.5, -50, 0.5, -15)
-alertLabel.Size = UDim2.new(0, 100, 0, 30)
-alertLabel.Text = "ဗုံးရနေပီ!" -- Alert message
-alertLabel.TextColor3 = Color3.new(1, 0, 0) -- Red text
-alertLabel.Visible = false -- Initially hidden
-alertLabel.BackgroundTransparency = 1 -- No background
+-- Alert Button setup (larger size for alert)
+alertButton = Instance.new("TextButton", screenGui)
+alertButton.Position = UDim2.new(0.5, -75, 0.5, -30)
+alertButton.Size = UDim2.new(0, 150, 0, 60) -- Larger button for alert
+alertButton.Text = "ဗုံးရနေပီ!"
+alertButton.TextColor3 = Color3.new(1, 0, 0) -- Red text
+alertButton.Visible = false -- Initially hidden
+alertButton.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+alertButton.BackgroundTransparency = 0.5 -- Slight transparency for alert
+alertButton.TextSize = 24 -- Increase text size for alert
+alertButton.Draggable = false
 
 -- Function to find the closest player
 local function getClosestPlayer()
@@ -82,9 +86,9 @@ local function boomThrow()
 
             -- Show alert when the bomb is near the player
             if closestPlayer == player then
-                alertLabel.Visible = true -- Show alert
+                alertButton.Visible = true -- Show alert button
             else
-                alertLabel.Visible = false -- Hide alert when not close
+                alertButton.Visible = false -- Hide alert when not close
             end
 
             -- Adjust the actual throwing logic here
@@ -98,7 +102,7 @@ local function boomThrow()
             humanoidRootPart.CFrame = originalPosition -- Return to original position
 
             -- Hide the alert after returning
-            alertLabel.Visible = false
+            alertButton.Visible = false
         end
     end
 end
