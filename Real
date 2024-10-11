@@ -10,6 +10,7 @@ local originalPosition = nil
 local screenGui = Instance.new("ScreenGui", player.PlayerGui)
 local mainButton = Instance.new("TextButton", screenGui)
 local destroyButton = Instance.new("TextButton", screenGui)
+local alertButton = Instance.new("TextButton", screenGui) -- New alert button
 
 mainButton.Position = UDim2.new(0.5, -50, 0, 50)
 mainButton.Size = UDim2.new(0, 100, 0, 50)
@@ -22,6 +23,14 @@ destroyButton.Size = UDim2.new(0, 30, 0, 30)
 destroyButton.Text = "ဖျောက်မည်"
 destroyButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
 destroyButton.Draggable = true
+
+-- Alert button setup
+alertButton.Position = UDim2.new(0.5, -50, 0, 110) -- Position below the main button
+alertButton.Size = UDim2.new(0, 100, 0, 50)
+alertButton.Text = "ဗုံးရနေပီ!"
+alertButton.BackgroundColor3 = Color3.new(1, 1, 0) -- Yellow
+alertButton.Visible = false -- Initially hidden
+alertButton.Draggable = true
 
 -- Function to check if player has the bomb
 local function checkBombStatus()
@@ -55,10 +64,14 @@ local function handleTeleportation()
             local closestPlayer = getClosestPlayer()
             if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
                 humanoidRootPart.CFrame = closestPlayer.Character.HumanoidRootPart.CFrame
+                alertButton.Visible = true -- Show alert button when bomb is present
             end
-        elseif originalPosition then
-            humanoidRootPart.CFrame = CFrame.new(originalPosition)
-            originalPosition = nil
+        else
+            if originalPosition then
+                humanoidRootPart.CFrame = CFrame.new(originalPosition)
+                originalPosition = nil
+            end
+            alertButton.Visible = false -- Hide alert button when bomb is not present
         end
         wait(0.1)
     end
@@ -74,6 +87,7 @@ mainButton.MouseButton1Click:Connect(function()
     else
         mainButton.Text = "ပိတ်မည်"
         mainButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
+        alertButton.Visible = false -- Hide alert button if not bomb tagger
     end
 end)
 
