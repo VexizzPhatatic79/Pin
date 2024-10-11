@@ -1,6 +1,7 @@
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
 local isBombTagger = false
 
 -- UI setup
@@ -53,8 +54,14 @@ local function transferBombToClosestPlayer()
             local targetHumanoidRootPart = closestPlayer.Character:FindFirstChild("HumanoidRootPart")
             if targetHumanoidRootPart then
                 bomb.CFrame = targetHumanoidRootPart.CFrame
-                -- Disable bomb's collision to avoid killing the player
+                -- Disable bomb's collision to avoid interaction issues
                 bomb.CanCollide = false
+
+                -- To prevent self-inflicted death, check if current player still has the bomb
+                if bomb.Parent == player.Character then
+                    -- Bomb is still with the original player; reset any effects on the player
+                    humanoid.Health = humanoid.MaxHealth -- Keep player alive
+                end
             end
         end
     end
