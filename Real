@@ -58,14 +58,6 @@ alertButton.BackgroundTransparency = 0.5 -- Slight transparency for alert
 alertButton.TextSize = 24 -- Increase text size for alert
 alertButton.Draggable = false
 
--- Function to make the alert button shake
-local function shakeAlertButton()
-    for i = 1, 10 do
-        alertButton.Position = alertButton.Position + UDim2.new(0, math.random(-5, 5), 0, math.random(-5, 5))
-        wait(0.05)
-    end
-end
-
 -- Function to find the closest player
 local function getClosestPlayer()
     local closestPlayer = nil
@@ -83,6 +75,14 @@ local function getClosestPlayer()
     return closestPlayer
 end
 
+-- Function to shake the alert button
+local function shakeAlertButton()
+    for i = 1, 10 do
+        alertButton.Position = alertButton.Position + UDim2.new(0, math.random(-5, 5), 0, math.random(-5, 5))
+        wait(0.05) -- Small delay between shakes
+    end
+end
+
 -- Function to throw the "Boom" at the closest player and return to original position
 local function boomThrow()
     if isThrowEnabled then
@@ -97,7 +97,7 @@ local function boomThrow()
             -- Show alert when the bomb is near the player
             if closestPlayer == player then
                 alertButton.Visible = true -- Show alert button
-                shakeAlertButton() -- Call shake function
+                shakeAlertButton() -- Shake alert button when bomb is near
             else
                 alertButton.Visible = false -- Hide alert when not close
             end
