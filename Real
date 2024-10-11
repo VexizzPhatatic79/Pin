@@ -1,8 +1,10 @@
+-- LocalScript
+
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local humanoid = character:WaitForChild("Humanoid")
 local isBombTagger = false
+local originalPosition = nil
 
 -- UI setup
 local screenGui = Instance.new("ScreenGui", player.PlayerGui)
@@ -23,6 +25,7 @@ destroyButton.Draggable = true
 
 -- Function to check if player has the bomb
 local function checkBombStatus()
+    -- Replace with actual condition to check bomb status
     return character:FindFirstChild("Bomb") ~= nil
 end
 
@@ -42,37 +45,33 @@ local function getClosestPlayer()
     return closestPlayer
 end
 
--- Function to prevent the current player from dying
-local function preventDeath()
-    humanoid.Health = humanoid.MaxHealth -- Restore player's health
-end
-
--- Function to transfer bomb to the closest player
-local function transferBombToClosestPlayer()
-    if checkBombStatus() then
-        local bomb = character:FindFirstChild("Bomb")
-        local closestPlayer = getClosestPlayer()
-        if closestPlayer and closestPlayer.Character then
-            -- Move bomb to the closest player's character
-            bomb.Parent = closestPlayer.Character
-            -- Adjust the bomb's position relative to the new player
-            local targetHumanoidRootPart = closestPlayer.Character:FindFirstChild("HumanoidRootPart")
-            if targetHumanoidRootPart then
-                bomb.CFrame = targetHumanoidRootPart.CFrame
-                -- Disable bomb's collision to avoid issues
-                bomb.CanCollide = false
-
-                -- Prevent current player from dying
-                preventDeath()
+-- Main function to handle teleportation
+local function handleTeleportation()
+    while isBombTagger do
+        if checkBombStatus() then
+            if not originalPosition then
+                originalPosition = humanoidRootPart.Position
             end
+            local closestPlayer = getClosestPlayer()
+            if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                humanoidRootPart.CFrame = closestPlayer.Character.HumanoidRootPart.CFrame
+            end
+        elseif originalPosition then
+            humanoidRootPart.CFrame = CFrame.new(originalPosition)
+            originalPosition = nil
         end
+        wait(0.1)
     end
 end
 
 -- Button functionality
 mainButton.MouseButton1Click:Connect(function()
-    if checkBombStatus() then
-        transferBombToClosestPlayer()
+    isBombTagger = not isBombTagger
+    if isBombTagger then
+        mainButton.Text = "ဖွင့်မည်"
+        mainButton.BackgroundColor3 = Color3.new(0, 0, 1) -- Blue
+        handleTeleportation()
+    else
         mainButton.Text = "ပိတ်မည်"
         mainButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
     end
@@ -81,10 +80,4 @@ end)
 -- Destroy button functionality
 destroyButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
-end)
-
--- Listen to humanoid death and prevent player from dying
-humanoid.Died:Connect(function()
-    -- If the player dies, restore their health to prevent actual death
-    preventDeath()
 end)
