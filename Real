@@ -42,6 +42,11 @@ local function getClosestPlayer()
     return closestPlayer
 end
 
+-- Function to prevent the current player from dying
+local function preventDeath()
+    humanoid.Health = humanoid.MaxHealth -- Restore player's health
+end
+
 -- Function to transfer bomb to the closest player
 local function transferBombToClosestPlayer()
     if checkBombStatus() then
@@ -54,14 +59,11 @@ local function transferBombToClosestPlayer()
             local targetHumanoidRootPart = closestPlayer.Character:FindFirstChild("HumanoidRootPart")
             if targetHumanoidRootPart then
                 bomb.CFrame = targetHumanoidRootPart.CFrame
-                -- Disable bomb's collision to avoid interaction issues
+                -- Disable bomb's collision to avoid issues
                 bomb.CanCollide = false
 
-                -- To prevent self-inflicted death, check if current player still has the bomb
-                if bomb.Parent == player.Character then
-                    -- Bomb is still with the original player; reset any effects on the player
-                    humanoid.Health = humanoid.MaxHealth -- Keep player alive
-                end
+                -- Prevent current player from dying
+                preventDeath()
             end
         end
     end
@@ -79,4 +81,10 @@ end)
 -- Destroy button functionality
 destroyButton.MouseButton1Click:Connect(function()
     screenGui:Destroy()
+end)
+
+-- Listen to humanoid death and prevent player from dying
+humanoid.Died:Connect(function()
+    -- If the player dies, restore their health to prevent actual death
+    preventDeath()
 end)
