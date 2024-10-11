@@ -1,0 +1,73 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local isBombTagger = false
+
+-- UI setup
+local screenGui = Instance.new("ScreenGui", player.PlayerGui)
+local mainButton = Instance.new("TextButton", screenGui)
+local destroyButton = Instance.new("TextButton", screenGui)
+
+mainButton.Position = UDim2.new(0.5, -50, 0, 50)
+mainButton.Size = UDim2.new(0, 100, 0, 50)
+mainButton.Text = "ဖွင့်မည်"
+mainButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
+mainButton.Draggable = true
+
+destroyButton.Position = UDim2.new(0.5, 55, 0, 50)
+destroyButton.Size = UDim2.new(0, 30, 0, 30)
+destroyButton.Text = "ဖျောက်မည်"
+destroyButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
+destroyButton.Draggable = true
+
+-- Function to check if player has the bomb
+local function checkBombStatus()
+    return character:FindFirstChild("Bomb") ~= nil
+end
+
+-- Function to find the closest player
+local function getClosestPlayer()
+    local closestPlayer = nil
+    local minDistance = math.huge
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            local distance = (humanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
+            if distance < minDistance then
+                minDistance = distance
+                closestPlayer = otherPlayer
+            end
+        end
+    end
+    return closestPlayer
+end
+
+-- Function to transfer bomb to the closest player
+local function transferBombToClosestPlayer()
+    if checkBombStatus() then
+        local bomb = character:FindFirstChild("Bomb")
+        local closestPlayer = getClosestPlayer()
+        if closestPlayer and closestPlayer.Character then
+            -- Move bomb to the closest player's character
+            bomb.Parent = closestPlayer.Character
+            -- Optionally, you can adjust the bomb's position relative to the new player
+            local targetHumanoidRootPart = closestPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if targetHumanoidRootPart then
+                bomb.CFrame = targetHumanoidRootPart.CFrame
+            end
+        end
+    end
+end
+
+-- Button functionality
+mainButton.MouseButton1Click:Connect(function()
+    if checkBombStatus() then
+        transferBombToClosestPlayer()
+        mainButton.Text = "ပိတ်မည်"
+        mainButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
+    end
+end)
+
+-- Destroy button functionality
+destroyButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+end)
