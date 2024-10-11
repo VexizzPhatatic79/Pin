@@ -49,10 +49,12 @@ local function transferBombToClosestPlayer()
         if closestPlayer and closestPlayer.Character then
             -- Move bomb to the closest player's character
             bomb.Parent = closestPlayer.Character
-            -- Optionally, you can adjust the bomb's position relative to the new player
+            -- Adjust the bomb's position relative to the new player
             local targetHumanoidRootPart = closestPlayer.Character:FindFirstChild("HumanoidRootPart")
             if targetHumanoidRootPart then
                 bomb.CFrame = targetHumanoidRootPart.CFrame
+                -- Disable bomb's collision to avoid killing the player
+                bomb.CanCollide = false
             end
         end
     end
