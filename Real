@@ -1,47 +1,76 @@
--- LocalScript
-
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local isBombTagger = false
-local originalPosition = nil
+local isThrowEnabled = false
+local originalPosition = nil -- Store original position when throw starts
+local alertButton = nil -- Button to show alert
 
 -- UI setup
 local screenGui = Instance.new("ScreenGui", player.PlayerGui)
-local mainButton = Instance.new("TextButton", screenGui)
-local destroyButton = Instance.new("TextButton", screenGui)
-local alertButton = Instance.new("TextButton", screenGui) -- New alert button
+local title = Instance.new("TextLabel", screenGui) -- Add title
+local enableButton = Instance.new("TextButton", screenGui)
+local disableButton = Instance.new("TextButton", screenGui)
+local throwButton = Instance.new("TextButton", screenGui)
 
-mainButton.Position = UDim2.new(0.5, -50, 0, 50)
-mainButton.Size = UDim2.new(0, 100, 0, 50)
-mainButton.Text = "ဖွင့်မည်"
-mainButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
-mainButton.Draggable = true
+-- Title setup
+title.Position = UDim2.new(0.5, -50, 0, 10)
+title.Size = UDim2.new(0, 100, 0, 30) -- Smaller size for title
+title.Text = "KhantKhant"
+title.TextColor3 = Color3.new(1, 1, 0) -- Yellow text
+title.Font = Enum.Font.SourceSansBold -- Bold font
+title.BackgroundTransparency = 1 -- Remove background
+title.TextSize = 18 -- Make the title text slightly larger
 
-destroyButton.Position = UDim2.new(0.5, 55, 0, 50)
-destroyButton.Size = UDim2.new(0, 30, 0, 30)
-destroyButton.Text = "ဖျောက်မည်"
-destroyButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
-destroyButton.Draggable = true
+-- Enable Button setup (smaller size)
+enableButton.Position = UDim2.new(0.5, -25, 0, 50)
+enableButton.Size = UDim2.new(0, 50, 0, 25) -- Smaller size (50x25)
+enableButton.Text = "ဖွင့်မည်"
+enableButton.BackgroundColor3 = Color3.new(0, 1, 0) -- Green
+enableButton.Draggable = true
 
--- Alert button setup
-alertButton.Position = UDim2.new(0.5, -50, 0, 110) -- Position below the main button
-alertButton.Size = UDim2.new(0, 100, 0, 50)
-alertButton.Text = "ဗုံးရနေပီ!"
-alertButton.BackgroundColor3 = Color3.new(1, 1, 0) -- Yellow
+-- Disable Button setup (smaller size)
+disableButton.Position = UDim2.new(0.5, -25, 0, 90)
+disableButton.Size = UDim2.new(0, 50, 0, 25) -- Smaller size (50x25)
+disableButton.Text = "ပိတ်မည်"
+disableButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
+disableButton.Draggable = true
+disableButton.Visible = false -- Hide the disable button initially
+
+-- Throw Button setup (remove background, larger text, blue color)
+throwButton.Position = UDim2.new(0.5, -50, 0, 130)
+throwButton.Size = UDim2.new(0, 100, 0, 40) -- Larger size (100x40)
+throwButton.Text = "ပစ်မည်"
+throwButton.TextSize = 20 -- Increase text size
+throwButton.BackgroundColor3 = Color3.new(0, 0, 1) -- Blue background
+throwButton.BackgroundTransparency = 0 -- Remove background transparency
+throwButton.Draggable = true
+throwButton.Visible = false -- Hide initially, show only when enabled
+
+-- Alert Button setup (larger size for alert)
+alertButton = Instance.new("TextButton", screenGui)
+alertButton.Position = UDim2.new(0.5, -75, 0.5, -30)
+alertButton.Size = UDim2.new(0, 150, 0, 60) -- Larger button for alert
+alertButton.Text = "ဗုံးရနေပီ!" -- Alert message
+alertButton.TextColor3 = Color3.new(1, 0, 0) -- Red text
 alertButton.Visible = false -- Initially hidden
-alertButton.Draggable = true
+alertButton.BackgroundColor3 = Color3.new(0, 0, 0) -- Black background
+alertButton.BackgroundTransparency = 0.5 -- Slight transparency for alert
+alertButton.TextSize = 24 -- Increase text size for alert
+alertButton.Draggable = false
 
--- Function to check if player has the bomb
-local function checkBombStatus()
-    -- Replace with actual condition to check bomb status
-    return character:FindFirstChild("Bomb") ~= nil
+-- Function to make the alert button shake
+local function shakeAlertButton()
+    for i = 1, 10 do
+        alertButton.Position = alertButton.Position + UDim2.new(0, math.random(-5, 5), 0, math.random(-5, 5))
+        wait(0.05)
+    end
 end
 
 -- Function to find the closest player
 local function getClosestPlayer()
     local closestPlayer = nil
     local minDistance = math.huge
+
     for _, otherPlayer in pairs(game.Players:GetPlayers()) do
         if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
             local distance = (humanoidRootPart.Position - otherPlayer.Character.HumanoidRootPart.Position).Magnitude
@@ -54,44 +83,60 @@ local function getClosestPlayer()
     return closestPlayer
 end
 
--- Main function to handle teleportation
-local function handleTeleportation()
-    while isBombTagger do
-        if checkBombStatus() then
-            if not originalPosition then
-                originalPosition = humanoidRootPart.Position
+-- Function to throw the "Boom" at the closest player and return to original position
+local function boomThrow()
+    if isThrowEnabled then
+        local closestPlayer = getClosestPlayer()
+        if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            -- Save the current position before throwing
+            originalPosition = humanoidRootPart.CFrame -- Save the player's current position before throwing
+
+            -- Move to closest player's position and throw
+            humanoidRootPart.CFrame = CFrame.new(closestPlayer.Character.HumanoidRootPart.Position + Vector3.new(0, 3, 0))
+
+            -- Show alert when the bomb is near the player
+            if closestPlayer == player then
+                alertButton.Visible = true -- Show alert button
+                shakeAlertButton() -- Call shake function
+            else
+                alertButton.Visible = false -- Hide alert when not close
             end
-            local closestPlayer = getClosestPlayer()
-            if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                humanoidRootPart.CFrame = closestPlayer.Character.HumanoidRootPart.CFrame
-                alertButton.Visible = true -- Show alert button when bomb is present
+
+            -- Adjust the actual throwing logic here
+            local throwEvent = game.ReplicatedStorage:FindFirstChild("ThrowEvent") -- Make sure the event is correct
+            if throwEvent then
+                throwEvent:FireServer(closestPlayer.Character) -- Fire the event towards the closest player
             end
-        else
-            if originalPosition then
-                humanoidRootPart.CFrame = CFrame.new(originalPosition)
-                originalPosition = nil
-            end
-            alertButton.Visible = false -- Hide alert button when bomb is not present
+
+            -- After throwing, return to the original position
+            wait(0.5) -- Small delay after the throw
+            humanoidRootPart.CFrame = originalPosition -- Return to original position
+
+            -- Hide the alert after returning
+            alertButton.Visible = false
         end
-        wait(0.1)
     end
 end
 
--- Button functionality
-mainButton.MouseButton1Click:Connect(function()
-    isBombTagger = not isBombTagger
-    if isBombTagger then
-        mainButton.Text = "ဖွင့်မည်"
-        mainButton.BackgroundColor3 = Color3.new(0, 0, 1) -- Blue
-        handleTeleportation()
-    else
-        mainButton.Text = "ပိတ်မည်"
-        mainButton.BackgroundColor3 = Color3.new(1, 0, 0) -- Red
-        alertButton.Visible = false -- Hide alert button if not bomb tagger
-    end
+-- Enable Button functionality
+enableButton.MouseButton1Click:Connect(function()
+    isThrowEnabled = true
+    enableButton.Visible = false
+    disableButton.Visible = true
+    throwButton.Visible = true
 end)
 
--- Destroy button functionality
-destroyButton.MouseButton1Click:Connect(function()
-    screenGui:Destroy()
+-- Disable Button functionality
+disableButton.MouseButton1Click:Connect(function()
+    isThrowEnabled = false
+    enableButton.Visible = true
+    disableButton.Visible = false
+    throwButton.Visible = false
+end)
+
+-- Throw Button functionality
+throwButton.MouseButton1Click:Connect(function()
+    if isThrowEnabled then
+        boomThrow() -- Call the throw function when the button is clicked
+    end
 end)
