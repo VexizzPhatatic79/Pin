@@ -82,7 +82,7 @@ local function GetPlayer(Name)
     return nil
 end
 
--- Teleport Function: Teleports to the target player and back after 2 seconds
+-- Teleport Function: Teleports to the target player and follows them for 2 seconds
 local function TeleportToPlayer(TargetPlayer)
     local Character = Player.Character
     local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
@@ -97,9 +97,19 @@ local function TeleportToPlayer(TargetPlayer)
         -- Teleport to the target player
         HumanoidRootPart.CFrame = TRootPart.CFrame + Vector3.new(0, 3, 0) -- Teleport a bit above the target player
 
-        -- Wait for 2 seconds and then teleport back
-        wait(2)
-        HumanoidRootPart.CFrame = TeleportPosition -- Return to original position
+        -- Follow the target player for 2 seconds
+        for i = 1, 20 do -- 20 iterations, approx 2 seconds
+            wait(0.1) -- wait 0.1 second for smooth following
+            if TargetPlayer.Character and TargetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                TRootPart = TargetPlayer.Character.HumanoidRootPart
+                HumanoidRootPart.CFrame = TRootPart.CFrame + Vector3.new(0, 3, 0) -- Follow above the target player
+            else
+                break -- Stop following if the target player is no longer available
+            end
+        end
+
+        -- Teleport back to the original position
+        HumanoidRootPart.CFrame = TeleportPosition
     end
 end
 
