@@ -1,350 +1,138 @@
-local lp = game:GetService("Players").LocalPlayer
- 
-local function gplr(String)
-	local Found = {}
-	local strl = String:lower()
-	if strl == "all" then
-		for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-			table.insert(Found,v)
-		end
-	elseif strl == "others" then
-		for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-			if v.Name ~= lp.Name then
-				table.insert(Found,v)
-			end
-		end 
-	elseif strl == "me" then
-		for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-			if v.Name == lp.Name then
-				table.insert(Found,v)
-			end
-		end 
-	else
-		for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-			if v.Name:lower():sub(1, #String) == String:lower() then
-				table.insert(Found,v)
-			end
-		end 
-	end
-	return Found 
+function rmesh(a)
+if not (workspace[game.Players.LocalPlayer.Name][a].Handle:FindFirstChild('Mesh') or workspace[game.Players.LocalPlayer.Name][a].Handle:FindFirstChild('SpecialMesh')) then return end
+old=game.Players.LocalPlayer.Character
+game.Players.LocalPlayer.Character=workspace[game.Players.LocalPlayer.Name]
+for i,v in next, workspace[game.Players.LocalPlayer.Name]:FindFirstChild(a).Handle:GetDescendants() do
+if v:IsA('Mesh') or v:IsA('SpecialMesh') then
+v:Remove()
+end
+end
+for i = 1 , 2 do
+game.Players.LocalPlayer.Character=old
+end
 end
 
-local ScreenGui = Instance.new("ScreenGui")
-local ui = Instance.new("Frame")
-local title = Instance.new("TextLabel")
-local Frame = Instance.new("Frame")
-local Username = Instance.new("TextBox")
-local Kill = Instance.new("TextButton")
-local ced = Instance.new("TextLabel")
+HumanDied = false for i,v in next, game:GetService("Players").LocalPlayer.Character:GetDescendants() do if v:IsA("BasePart") then  _G.netless=game:GetService("RunService").Heartbeat:connect(function() v.AssemblyLinearVelocity = Vector3.new(-30,0,0) sethiddenproperty(game.Players.LocalPlayer,"MaximumSimulationRadius",math.huge) sethiddenproperty(game.Players.LocalPlayer,"SimulationRadius",999999999) end) end end  local plr = game.Players.LocalPlayer local char = plr.Character local srv = game:GetService('RunService') local ct = {}  char.Archivable = true local reanim = char:Clone() reanim.Name = 'Nexo '..plr.Name..'' fl=Instance.new('Folder',char) fl.Name ='Nexo' reanim.Animate.Disabled=true char.HumanoidRootPart:Destroy() char.Humanoid:ChangeState(16)  for i,v in next, char.Humanoid:GetPlayingAnimationTracks() do v:Stop() end char.Animate:Remove()  function create(part, parent, p, r) Instance.new("Attachment",part) Instance.new("AlignPosition",part) Instance.new("AlignOrientation",part) Instance.new("Attachment",parent) part.Attachment.Name = part.Name parent.Attachment.Name = part.Name part.AlignPosition.Attachment0 = part[part.Name] part.AlignOrientation.Attachment0 = part[part.Name] part.AlignPosition.Attachment1 = parent[part.Name] part.AlignOrientation.Attachment1 = parent[part.Name] parent[part.Name].Position = p or Vector3.new() part[part.Name].Orientation = r or Vector3.new() part.AlignPosition.MaxForce = 999999999 part.AlignPosition.MaxVelocity = math.huge part.AlignPosition.ReactionForceEnabled = false part.AlignPosition.Responsiveness = math.huge part.AlignOrientation.Responsiveness = math.huge part.AlignPosition.RigidityEnabled = false part.AlignOrientation.MaxTorque = 999999999 end  for i,v in next, char:GetDescendants() do if v:IsA('Accessory') then v.Handle:BreakJoints() create(v.Handle,reanim[v.Name].Handle) end end  char.Torso['Left Shoulder']:Destroy() char.Torso['Right Shoulder']:Destroy() char.Torso['Left Hip']:Destroy() char.Torso['Right Hip']:Destroy()  create(char['Torso'],reanim['Torso']) create(char['Left Arm'],reanim['Left Arm']) create(char['Right Arm'],reanim['Right Arm']) create(char['Left Leg'],reanim['Left Leg']) create(char['Right Leg'],reanim['Right Leg'])  for i,v in next, reanim:GetDescendants() do if v:IsA('BasePart') or v:IsA('Decal') then v.Transparency = 1 end end  reanim.Parent = fl  for i,v in next, reanim:GetDescendants() do if v:IsA('BasePart') then table.insert(ct,srv.RenderStepped:Connect(function() v.CanCollide = false end)) end end  for i,v in next, char:GetDescendants() do if v:IsA('BasePart') then table.insert(ct,srv.RenderStepped:Connect(function() v.CanCollide = false end)) end end  for i,v in next, reanim:GetDescendants() do if v:IsA('BasePart') then table.insert(ct,srv.Stepped:Connect(function() v.CanCollide = false end)) end end  for i,v in next, char:GetDescendants() do if v:IsA('BasePart') then table.insert(ct,srv.Stepped:Connect(function() v.CanCollide = false end)) end end  table.insert(ct,reanim.Humanoid.Died:Connect(function() plr.Character = char char:BreakJoints() reanim:Destroy() game.Players:Chat('-gr') _G.netless:Disconnect() HumanDied = true for _,v in pairs(ct) do v:Disconnect() end end))  plr.Character = reanim workspace.CurrentCamera.CameraSubject = reanim.Humanoid
 
-ScreenGui.Parent = game:GetService("CoreGui")
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+IT = Instance.new
+CF = CFrame.new
+VT = Vector3.new
+RAD = math.rad
+C3 = Color3.new
+UD2 = UDim2.new
+BRICKC = BrickColor.new
+ANGLES = CFrame.Angles
+EULER = CFrame.fromEulerAnglesXYZ
+COS = math.cos
+ACOS = math.acos
+SIN = math.sin
+ASIN = math.asin
+ABS = math.abs
+MRANDOM = math.random
+FLOOR = math.floor
 
-ui.Name = "ui"
-ui.Parent = ScreenGui
-ui.Active = true
-ui.BackgroundColor3 = Color3.new(0, 0, 0)
-ui.BackgroundTransparency = 0
-ui.BorderSizePixel = 3
-ui.Position = UDim2.new(0.254972845, 0, 0.419703096, 0)
-ui.Size = UDim2.new(0, 278, 0, 278)
+speed = 1
+sine = 1
+srv = game:GetService('RunService')
 
-title.Name = "title"
-title.Parent = ui
-title.BackgroundColor3 = Color3.new(68, 68, 68)
-title.BackgroundTransparency = 1
-title.BorderSizePixel = 2
-title.Position = UDim2.new(0, 0, 0.0199999996, 0)
-title.Size = UDim2.new(1, 0, 0, 50)
-title.Font = Enum.Font.SourceSans
-title.Text = "KillPlayer"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.TextScaled = true
-title.TextSize = 14
-title.TextWrapped = true
+reanim = game.Players.LocalPlayer.Character
 
-Frame.Parent = title
-Frame.BackgroundColor3 = Color3.new(0, 0, 0)
-Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0.07, 0, 0.860000014, 0)
-Frame.Size = UDim2.new(0.85, 0, 0, 6)
-
-Username.Name = "F20 FR"
-Username.Parent = ui
-Username.BackgroundColor3 = Color3.new(1, 1, 1)
-Username.BorderSizePixel = 0
-Username.Position = UDim2.new(0.100000001, 0, 0.300000012, 0)
-Username.Size = UDim2.new(0.800000012, 0, 0, 50)
-Username.Font = Enum.Font.SourceSans
-Username.PlaceholderText = "Username"
-Username.Text = "Username"
-Username.TextColor3 = Color3.new(0, 0, 0)
-Username.TextScaled = true
-Username.TextSize = 14
-Username.TextWrapped = true
-
-Kill.Name = "Stick"
-Kill.Parent = ui
-Kill.BackgroundColor3 = Color3.new(0.25, 0.25, 0.25)
-Kill.BackgroundTransparency = 0
-Kill.BorderSizePixel = 2
-Kill.Position = UDim2.new(0.25, 0, 0.629999971, 0)
-Kill.Size = UDim2.new(0.5, 0, 0, 45)
-Kill.Font = Enum.Font.Gotham
-Kill.Text = "Kill"
-Kill.TextColor3 = Color3.new(0, 0, 0)
-Kill.TextScaled = true
-Kill.TextSize = 10
-Kill.TextWrapped = true
-ui.Draggable = true
-
-ced.Name = "made"
-ced.Parent = ui
-ced.BackgroundColor3 = Color3.new(68, 68, 68)
-ced.BackgroundTransparency = 1
-ced.BorderSizePixel = 2
-ced.Position = UDim2.new(0, 0, 0.769999981, 0)
-ced.Size = UDim2.new(1, 0, 0, 50)
-ced.Font = Enum.Font.SourceSans
-ced.Text = "Made by F20 FR"
-ced.TextColor3 = Color3.new(1, 1, 1)
-ced.TextScaled = true
-ced.TextSize = 14
-ced.TextWrapped = true
-
-local function notif(str,dur)
-	game:GetService("StarterGui"):SetCore("SendNotification", { 
-    Title = "SubscribeF20FR";
-    Text = str;})
-Duration = dur or 3;
+function hat(h,p,c1,c0,m)
+reanim[h].Handle.AccessoryWeld.Part1=reanim[p]
+reanim[h].Handle.AccessoryWeld.C1=c1 or CFrame.new()
+reanim[h].Handle.AccessoryWeld.C0=reanim[h].Handle.AccessoryWeld.C0:Lerp(c0 or CFrame.new(),1)
+if m == true then
+rmesh(h)
+end
 end
 
-Kill.MouseButton1Click:Connect(function()
-	local Player = gplr(Username.Text)
-	if Player[1] then
-		Player = Player[1]
-          LocalPlayer = game.Players.LocalPlayer
-          
-         if LocalPlayer.Character.PrimaryPart ~= nil then
-                local Character = LocalPlayer.Character
-                local previous = LocalPlayer.Character.PrimaryPart.CFrame
-                
-                Character.Archivable = true
-                local Clone = Character:Clone()
-                LocalPlayer.Character = Clone
-                wait(0.5)
-                LocalPlayer.Character = Character
-                wait(0.2)
-                
-                if LocalPlayer.Character and Player.Character and Player.Character.PrimaryPart ~= nil then
-                    if LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
-                        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):Destroy()
-                    end
-    
-                    local Humanoid = Instance.new("Humanoid")
-                    Humanoid.Parent = LocalPlayer.Character
-    
-                    local Tool = nil
-    
-                    if LocalPlayer.Character:FindFirstChildOfClass("Tool") then
-                        Tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
-                    elseif LocalPlayer.Backpack and LocalPlayer.Backpack:FindFirstChildOfClass("Tool") then
-                        Tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
-                    end
-                    print(Tool)
+m=game.Players.LocalPlayer:GetMouse()
+RJ = reanim.HumanoidRootPart.RootJoint
+RS = reanim.Torso['Right Shoulder']
+LS = reanim.Torso['Left Shoulder']
+RH = reanim.Torso['Right Hip']
+LH = reanim.Torso['Left Hip']
+Root = reanim.HumanoidRootPart
+NECK = reanim.Torso.Neck
+NECK.C0 = CF(0,1,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+NECK.C1 = CF(0,-0.5,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+RJ.C1 = CF(0,-1,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+RJ.C0 = CF(0,0,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+RS.C1 = CF(0,0.5,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+LS.C1 = CF(0,0.5,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+RH.C1 = CF(0,1,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+LH.C1 = CF(0,1,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+RH.C0 = CF(0,0,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+LH.C0 = CF(0,0,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+RS.C0 = CF(0,0,0)*ANGLES(RAD(0),RAD(0),RAD(0))
+LS.C0 = CF(0,0,0)*ANGLES(RAD(0),RAD(0),RAD(0))
 
-                    if Tool ~= nil then
-                        Tool.Parent = LocalPlayer.Backpack
-                        
-                        Player.Character.HumanoidRootPart.Anchored = true
-                        
-                        local Arm = game.Players.LocalPlayer.Character['Right Arm'].CFrame * CFrame.new(0, -1, 0, 1, 0, 0, 0, 0, 1, 0, -1, 0)
-                        Tool.Grip = Arm:ToObjectSpace(Player.Character.PrimaryPart.CFrame):Inverse()
-                        
-                        Tool.Parent = LocalPlayer.Character
-                        Workspace.CurrentCamera.CameraSubject = Tool.Handle
-              
-                        repeat
-                            wait()
-                        until not Tool or Tool and (Tool.Parent == Workspace or Tool.Parent == Player.Character)
-                        Player.Character.HumanoidRootPart.Anchored = false
-                        wait(0.1)
-                        Humanoid.Health = 0
-                        LocalPlayer.Character = nil
-                    end
-                end
-     
-                spawn(function()
-                LocalPlayer.CharacterAdded:Wait()
-                Player.Character.HumanoidRootPart.Anchored = false
-                if Player.Character.Humanoid.Health <= 15 then
-                 notif("The requested user has been killed!")
-                repeat wait() until LocalPlayer.Character.PrimaryPart ~= nil
-                wait(0.4)
-                LocalPlayer.Character:SetPrimaryPartCFrame(previous)
-              end
-           end)
-       end
-    end
-end)
+-- for modes u can go in this link : https://Nexo.notxeneon15.repl.co/nexo/modes.lua
 
-local function MOQC_fake_script() -- HackFrame.RGB_Script 
-	local script = Instance.new('LocalScript', Kill)
-	
-	while wait() do
-		script.Parent.BackgroundColor3 = Color3.new(255/255,0/255,0/255)
-		for i = 0,255,10 do
-			wait()
-			script.Parent.BackgroundColor3 = Color3.new(255/255,i/255,0/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script.Parent.BackgroundColor3 = Color3.new(i/255,255/255,0/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script.Parent.BackgroundColor3 = Color3.new(0/255,255/255,i/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script.Parent.BackgroundColor3 = Color3.new(0/255,i/255,255/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script.Parent.BackgroundColor3 = Color3.new(i/255,0/255,255/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script.Parent.BackgroundColor3 = Color3.new(255/255,0/255,i/255)
-		end
-	end
+coroutine.wrap(function()
+while true do -- anim changer
+if HumanDied then break end
+sine = sine + speed
+local rlegray = Ray.new(reanim["Right Leg"].Position + Vector3.new(0, 0.5, 0), Vector3.new(0, -2, 0))
+local rlegpart, rlegendPoint = workspace:FindPartOnRay(rlegray, char)
+local llegray = Ray.new(reanim["Left Leg"].Position + Vector3.new(0, 0.5, 0), Vector3.new(0, -2, 0))
+local llegpart, llegendPoint = workspace:FindPartOnRay(llegray, char)
+local rightvector = (Root.Velocity * Root.CFrame.rightVector).X + (Root.Velocity * Root.CFrame.rightVector).Z
+local lookvector = (Root.Velocity * Root.CFrame.lookVector).X + (Root.Velocity * Root.CFrame.lookVector).Z
+if lookvector > reanim.Humanoid.WalkSpeed then
+lookvector = reanim.Humanoid.WalkSpeed
 end
-coroutine.wrap(MOQC_fake_script)()
-local function MOQC_fake_script() -- HackFrame.RGB_Script 
-	local script2 = Instance.new('LocalScript', title)
-	
-	while wait() do
-		script2.Parent.TextColor3 = Color3.new(255/255,0/255,0/255)
-		for i = 0,255,10 do
-			wait()
-			script2.Parent.TextColor3 = Color3.new(255/255,i/255,0/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script2.Parent.TextColor3 = Color3.new(i/255,255/255,0/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script2.Parent.TextColor3 = Color3.new(0/255,255/255,i/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script2.Parent.TextColor3 = Color3.new(0/255,i/255,255/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script2.Parent.TextColor3 = Color3.new(i/255,0/255,255/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script2.Parent.TextColor3 = Color3.new(255/255,0/255,i/255)
-		end
-	end
+if lookvector < -reanim.Humanoid.WalkSpeed then
+lookvector = -reanim.Humanoid.WalkSpeed
 end
-coroutine.wrap(MOQC_fake_script)()
-local function MOQC_fake_script() -- HackFrame.RGB_Script 
-	local script3 = Instance.new('LocalScript', Frame)
-	
-	while wait() do
-		script3.Parent.BackgroundColor3 = Color3.new(255/255,0/255,0/255)
-		for i = 0,255,10 do
-			wait()
-			script3.Parent.BackgroundColor3 = Color3.new(255/255,i/255,0/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script3.Parent.BackgroundColor3 = Color3.new(i/255,255/255,0/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script3.Parent.BackgroundColor3 = Color3.new(0/255,255/255,i/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script3.Parent.BackgroundColor3 = Color3.new(0/255,i/255,255/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script3.Parent.BackgroundColor3 = Color3.new(i/255,0/255,255/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script3.Parent.BackgroundColor3 = Color3.new(255/255,0/255,i/255)
-		end
-	end
+if rightvector > reanim.Humanoid.WalkSpeed then
+rightvector = reanim.Humanoid.WalkSpeed
 end
-coroutine.wrap(MOQC_fake_script)()
-local function MOQC_fake_script() -- HackFrame.RGB_Script 
-	local script4 = Instance.new('LocalScript', Frame)
-	
-	while wait() do
-		script4.Parent.BackgroundColor3 = Color3.new(255/255,0/255,0/255)
-		for i = 0,255,10 do
-			wait()
-			script4.Parent.BackgroundColor3 = Color3.new(255/255,i/255,0/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script4.Parent.BackgroundColor3 = Color3.new(i/255,255/255,0/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script4.Parent.BackgroundColor3 = Color3.new(0/255,255/255,i/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script4.Parent.BackgroundColor3 = Color3.new(0/255,i/255,255/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script4.Parent.BackgroundColor3 = Color3.new(i/255,0/255,255/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script4.Parent.BackgroundColor3 = Color3.new(255/255,0/255,i/255)
-		end
-	end
+if rightvector < -reanim.Humanoid.WalkSpeed then
+rightvector = -reanim.Humanoid.WalkSpeed
 end
-coroutine.wrap(MOQC_fake_script)()
-local function MOQC_fake_script() -- HackFrame.RGB_Script 
-	local script5 = Instance.new('LocalScript', ced)
-	
-	while wait() do
-		script5.Parent.TextColor3 = Color3.new(255/255,0/255,0/255)
-		for i = 0,255,10 do
-			wait()
-			script5.Parent.TextColor3 = Color3.new(255/255,i/255,0/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script5.Parent.TextColor3 = Color3.new(i/255,255/255,0/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script5.Parent.TextColor3 = Color3.new(0/255,255/255,i/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script5.Parent.TextColor3 = Color3.new(0/255,i/255,255/255)
-		end
-		for i = 0,255,10 do
-			wait()
-			script5.Parent.TextColor3 = Color3.new(i/255,0/255,255/255)
-		end
-		for i = 255,0,-10 do
-			wait()
-			script5.Parent.TextColor3 = Color3.new(255/255,0/255,i/255)
-		end
-	end
+local lookvel = lookvector / reanim.Humanoid.WalkSpeed
+local rightvel = rightvector / reanim.Humanoid.WalkSpeed
+if reanim.Humanoid.Jump then -- jump
+NECK.C0=NECK.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RJ.C0=RJ.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RS.C0=RS.C0:Lerp(CFrame.new(1+0*math.cos(sine/10),-0.2+1*math.cos(sine/5),-1+0*math.cos(sine/1))*CFrame.Angles(math.rad(30+0*math.cos(sine/10)),math.rad(-30+0*math.sin(sine/10)),math.rad(-20+0*math.cos(sine/10))),.2) 
+LS.C0=LS.C0:Lerp(CFrame.new(-1.5+0*math.cos(sine/10),0.5+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RH.C0=RH.C0:Lerp(CFrame.new(0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+LH.C0=LH.C0:Lerp(CFrame.new(-0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2)
+elseif Root.Velocity.y < -1 and reanim.Humanoid.Jump then -- fall
+NECK.C0=NECK.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RJ.C0=RJ.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RS.C0=RS.C0:Lerp(CFrame.new(1+0*math.cos(sine/10),-0.2+1*math.cos(sine/5),-1+0*math.cos(sine/1))*CFrame.Angles(math.rad(30+0*math.cos(sine/10)),math.rad(-30+0*math.sin(sine/10)),math.rad(-20+0*math.cos(sine/10))),.2) 
+LS.C0=LS.C0:Lerp(CFrame.new(-1.5+0*math.cos(sine/10),0.5+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RH.C0=RH.C0:Lerp(CFrame.new(0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+LH.C0=LH.C0:Lerp(CFrame.new(-0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2)
+elseif Root.Velocity.Magnitude < 2 then -- idle
+hat('Pal Hair','Torso',CFrame.new(0,0,0),CFrame.new(0+0*math["cos"](sine/10),1.5+0*math["cos"](sine/10),1.5+0.2*math["cos"](sine/1))*CFrame.Angles(math.rad(0+0*math["cos"](sine/10)),math.rad(0+0*math["cos"](sine/10)),math.rad(0+0*math["sin"](sine/1))),true)
+NECK.C0=NECK.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RJ.C0=RJ.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RS.C0=RS.C0:Lerp(CFrame.new(1+0*math.cos(sine/10),-0.2+1*math.cos(sine/5),-1+0*math.cos(sine/1))*CFrame.Angles(math.rad(30+0*math.cos(sine/10)),math.rad(-30+0*math.sin(sine/10)),math.rad(-20+0*math.cos(sine/10))),.2) 
+LS.C0=LS.C0:Lerp(CFrame.new(-1.5+0*math.cos(sine/10),0.5+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RH.C0=RH.C0:Lerp(CFrame.new(0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+LH.C0=LH.C0:Lerp(CFrame.new(-0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2)
+elseif Root.Velocity.Magnitude < 20 then -- walk
+hat('Pal Hair','Torso',CFrame.new(0,0,0),CFrame.new(0+0*math["cos"](sine/10),1.5+0*math["cos"](sine/10),1.5+0.2*math["cos"](sine/1))*CFrame.Angles(math.rad(0+0*math["cos"](sine/10)),math.rad(0+0*math["cos"](sine/10)),math.rad(0+0*math["sin"](sine/1))),true)
+NECK.C0=NECK.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RJ.C0=RJ.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RS.C0=RS.C0:Lerp(CFrame.new(1+0*math.cos(sine/10),-0.2+1*math.cos(sine/5),-1+0*math.cos(sine/1))*CFrame.Angles(math.rad(30+0*math.cos(sine/10)),math.rad(-30+0*math.sin(sine/10)),math.rad(-20+0*math.cos(sine/10))),.2) 
+LS.C0=LS.C0:Lerp(CFrame.new(-1.5+0*math.cos(sine/10),0.5+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+50*math.cos(sine/9)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RH.C0=RH.C0:Lerp(CFrame.new(0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+60*math.cos(sine/9)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+LH.C0=LH.C0:Lerp(CFrame.new(-0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+60*math.sin(sine/9)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2)
+elseif Root.Velocity.Magnitude > 20 then -- run
+hat('Pal Hair','Torso',CFrame.new(0,0,0),CFrame.new(0+0*math["cos"](sine/10),1.5+0*math["cos"](sine/10),1.5+0.2*math["cos"](sine/1))*CFrame.Angles(math.rad(0+0*math["cos"](sine/10)),math.rad(0+0*math["cos"](sine/10)),math.rad(0+0*math["sin"](sine/1))),true)
+NECK.C0=NECK.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RJ.C0=RJ.C0:Lerp(CFrame.new(0+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RS.C0=RS.C0:Lerp(CFrame.new(1+0*math.cos(sine/10),-0.2+1*math.cos(sine/5),-1+0*math.cos(sine/1))*CFrame.Angles(math.rad(30+0*math.cos(sine/10)),math.rad(-30+0*math.sin(sine/10)),math.rad(-20+0*math.cos(sine/10))),.2) 
+LS.C0=LS.C0:Lerp(CFrame.new(-1.5+0*math.cos(sine/10),0.5+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+50*math.cos(sine/9)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+RH.C0=RH.C0:Lerp(CFrame.new(0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+60*math.cos(sine/9)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2) 
+LH.C0=LH.C0:Lerp(CFrame.new(-0.5+0*math.cos(sine/10),-1+0*math.cos(sine/10),0+0*math.cos(sine/10))*CFrame.Angles(math.rad(0+60*math.sin(sine/9)),math.rad(0+0*math.cos(sine/10)),math.rad(0+0*math.cos(sine/10))),.2)
 end
-coroutine.wrap(MOQC_fake_script)()
+srv.RenderStepped:Wait()
+end
+end)()
+--Created using Nexo Animator V4
