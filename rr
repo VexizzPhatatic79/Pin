@@ -129,8 +129,12 @@ Kill.MouseButton1Click:Connect(function()
 		if Character and Character.PrimaryPart then
 			local humanoid = Player.Character:FindFirstChildOfClass("Humanoid")
 			if humanoid then
-				humanoid.Health = 0
-				notif(Player.Name .. " has been killed!")
+				if humanoid.Health > 0 then
+					humanoid.Health = 0
+					notif(Player.Name .. " has been killed!")
+				else
+					notif(Player.Name .. " is already dead.")
+				end
 			else
 				notif("Humanoid not found for " .. Player.Name)
 			end
