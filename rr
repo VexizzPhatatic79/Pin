@@ -1,35 +1,39 @@
-local lp = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
--- Function to get player based on input
 local function gplr(String)
 	local Found = {}
 	local strl = String:lower()
 	if strl == "all" then
-		for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-			table.insert(Found,v)
+		for _, v in pairs(Players:GetPlayers()) do
+			table.insert(Found, v)
 		end
 	elseif strl == "others" then
-		for i,v in pairs(game:GetService("Players"):GetPlayers()) do
-			if v.Name ~= lp.Name then
-				table.insert(Found,v)
+		for _, v in pairs(Players:GetPlayers()) do
+			if v.Name ~= LocalPlayer.Name then
+				table.insert(Found, v)
 			end
 		end 
 	elseif strl == "me" then
-		table.insert(Found, lp)
+		for _, v in pairs(Players:GetPlayers()) do
+			if v.Name == LocalPlayer.Name then
+				table.insert(Found, v)
+			end
+		end 
 	else
-		for i,v in pairs(game:GetService("Players"):GetPlayers()) do
+		for _, v in pairs(Players:GetPlayers()) do
 			if v.Name:lower():sub(1, #String) == String:lower() then
-				table.insert(Found,v)
+				table.insert(Found, v)
 			end
 		end 
 	end
 	return Found 
 end
 
--- GUI creation
 local ScreenGui = Instance.new("ScreenGui")
 local ui = Instance.new("Frame")
 local title = Instance.new("TextLabel")
+local Frame = Instance.new("Frame")
 local Username = Instance.new("TextBox")
 local Kill = Instance.new("TextButton")
 local ced = Instance.new("TextLabel")
@@ -41,97 +45,133 @@ ui.Name = "ui"
 ui.Parent = ScreenGui
 ui.Active = true
 ui.BackgroundColor3 = Color3.new(0, 0, 0)
+ui.BackgroundTransparency = 0
 ui.BorderSizePixel = 3
-ui.Position = UDim2.new(0.25, 0, 0.42, 0)
+ui.Position = UDim2.new(0.254972845, 0, 0.419703096, 0)
 ui.Size = UDim2.new(0, 278, 0, 278)
 
 title.Name = "title"
 title.Parent = ui
+title.BackgroundColor3 = Color3.new(68, 68, 68)
 title.BackgroundTransparency = 1
-title.Position = UDim2.new(0, 0, 0.02, 0)
+title.BorderSizePixel = 2
+title.Position = UDim2.new(0, 0, 0.0199999996, 0)
 title.Size = UDim2.new(1, 0, 0, 50)
 title.Font = Enum.Font.SourceSans
-title.Text = "Kill Player"
+title.Text = "KillPlayer"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.TextScaled = true
+title.TextSize = 14
+title.TextWrapped = true
 
-Username.Name = "Username"
+Frame.Parent = title
+Frame.BackgroundColor3 = Color3.new(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.07, 0, 0.860000014, 0)
+Frame.Size = UDim2.new(0.85, 0, 0, 6)
+
+Username.Name = "F20 FR"
 Username.Parent = ui
 Username.BackgroundColor3 = Color3.new(1, 1, 1)
 Username.BorderSizePixel = 0
-Username.Position = UDim2.new(0.1, 0, 0.3, 0)
-Username.Size = UDim2.new(0.8, 0, 0, 50)
+Username.Position = UDim2.new(0.100000001, 0, 0.300000012, 0)
+Username.Size = UDim2.new(0.800000012, 0, 0, 50)
 Username.Font = Enum.Font.SourceSans
-Username.PlaceholderText = "Enter Username"
-Username.Text = ""
+Username.PlaceholderText = "Username"
+Username.Text = "Username"
 Username.TextColor3 = Color3.new(0, 0, 0)
 Username.TextScaled = true
+Username.TextSize = 14
+Username.TextWrapped = true
 
-Kill.Name = "KillButton"
+Kill.Name = "Stick"
 Kill.Parent = ui
 Kill.BackgroundColor3 = Color3.new(0.25, 0.25, 0.25)
+Kill.BackgroundTransparency = 0
 Kill.BorderSizePixel = 2
-Kill.Position = UDim2.new(0.25, 0, 0.63, 0)
+Kill.Position = UDim2.new(0.25, 0, 0.629999971, 0)
 Kill.Size = UDim2.new(0.5, 0, 0, 45)
 Kill.Font = Enum.Font.Gotham
 Kill.Text = "Kill"
 Kill.TextColor3 = Color3.new(0, 0, 0)
 Kill.TextScaled = true
+Kill.TextSize = 10
+Kill.TextWrapped = true
+ui.Draggable = true
 
-ced.Name = "credits"
+ced.Name = "made"
 ced.Parent = ui
+ced.BackgroundColor3 = Color3.new(68, 68, 68)
 ced.BackgroundTransparency = 1
-ced.Position = UDim2.new(0, 0, 0.77, 0)
+ced.BorderSizePixel = 2
+ced.Position = UDim2.new(0, 0, 0.769999981, 0)
 ced.Size = UDim2.new(1, 0, 0, 50)
 ced.Font = Enum.Font.SourceSans
 ced.Text = "Made by F20 FR"
 ced.TextColor3 = Color3.new(1, 1, 1)
 ced.TextScaled = true
+ced.TextSize = 14
+ced.TextWrapped = true
 
--- Function to display notifications
 local function notif(str, dur)
 	game:GetService("StarterGui"):SetCore("SendNotification", { 
-		Title = "Notification",
-		Text = str,
-		Duration = dur or 3
+		Title = "Notification";
+		Text = str;
+		Duration = dur or 3;
 	})
 end
 
--- Kill button logic
 Kill.MouseButton1Click:Connect(function()
 	local Player = gplr(Username.Text)
-	if Player[1] then
+	if #Player > 0 then
 		Player = Player[1]
-		if Player.Character and Player.Character:FindFirstChild("Humanoid") then
-			-- Kill the player by setting Humanoid Health to 0
-			Player.Character.Humanoid.Health = 0
-			notif("Player has been killed!", 3)
+		local Character = LocalPlayer.Character
+		if Character and Character.PrimaryPart then
+			local humanoid = Player.Character:FindFirstChildOfClass("Humanoid")
+			if humanoid then
+				humanoid.Health = 0
+				notif(Player.Name .. " has been killed!")
+			else
+				notif("Humanoid not found for " .. Player.Name)
+			end
 		else
-			notif("Humanoid not found!", 3)
+			notif("Your character is not valid.")
 		end
 	else
-		notif("Player not found!", 3)
+		notif("Player not found.")
 	end
 end)
 
--- RGB Color Animation (Optional)
-local function rgbAnimation(button)
+local function MOQC_fake_script() -- Color change script
+	local script = Instance.new('LocalScript', Kill)
+	
 	while wait() do
+		script.Parent.BackgroundColor3 = Color3.new(1, 0, 0)
 		for i = 0, 255, 10 do
-			wait(0.05)
-			button.BackgroundColor3 = Color3.fromRGB(i, 255-i, 0)
+			wait()
+			script.Parent.BackgroundColor3 = Color3.new(1, i/255, 0)
+		end
+		for i = 255, 0, -10 do
+			wait()
+			script.Parent.BackgroundColor3 = Color3.new(i/255, 1, 0)
 		end
 		for i = 0, 255, 10 do
-			wait(0.05)
-			button.BackgroundColor3 = Color3.fromRGB(255-i, 0, i)
+			wait()
+			script.Parent.BackgroundColor3 = Color3.new(0, 1, i/255)
+		end
+		for i = 255, 0, -10 do
+			wait()
+			script.Parent.BackgroundColor3 = Color3.new(0, i/255, 1)
 		end
 		for i = 0, 255, 10 do
-			wait(0.05)
-			button.BackgroundColor3 = Color3.fromRGB(0, i, 255-i)
+			wait()
+			script.Parent.BackgroundColor3 = Color3.new(i/255, 0, 1)
+		end
+		for i = 255, 0, -10 do
+			wait()
+			script.Parent.BackgroundColor3 = Color3.new(1, 0, i/255)
 		end
 	end
 end
 
--- Apply RGB effect to buttons and title (Optional)
-coroutine.wrap(rgbAnimation)(Kill)
-coroutine.wrap(rgbAnimation)(title)
+coroutine.wrap(MOQC_fake_script)()
