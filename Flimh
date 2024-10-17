@@ -1,6 +1,6 @@
  -- Made by JackMcJagger15
 
-power = 500 -- change this to make it more or less powerful
+power = 5000 -- change this to make it more or less powerful
 
 game:GetService('RunService').Stepped:connect(function()
 game.Players.LocalPlayer.Character.Head.CanCollide = false
