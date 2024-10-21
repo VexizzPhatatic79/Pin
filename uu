@@ -67,10 +67,31 @@ local function Message(_Title, _Text, Time)
     game:GetService("StarterGui"):SetCore("SendNotification", {Title = _Title, Text = _Text, Duration = Time})
 end
 
--- SkidFling Function (Same as before)
+-- SkidFling Function: Physically flings the target player
 local function SkidFling(TargetPlayer)
-    -- (Fling logic remains unchanged)
-    -- ... (same function as before)
+    local character = Player.Character
+    local targetCharacter = TargetPlayer.Character
+
+    if character and targetCharacter then
+        -- HumanoidRootPart of both the Player and the Target
+        local hrp = character:FindFirstChild("HumanoidRootPart")
+        local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+
+        if hrp and targetHrp then
+            -- BodyVelocity to apply force
+            local bodyVelocity = Instance.new("BodyVelocity")
+            bodyVelocity.Velocity = Vector3.new(10000, 10000, 10000) -- Adjust the force here
+            bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000) -- Maximum force allowed
+            bodyVelocity.Parent = hrp
+
+            -- Align Position to the target's root part
+            hrp.CFrame = targetHrp.CFrame -- Align the player to the target player
+
+            -- Apply force and fling
+            wait(0.1) -- Wait before removing force
+            bodyVelocity:Destroy() -- Remove the force after flinging
+        end
+    end
 end
 
 -- TextButton functionality
