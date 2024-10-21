@@ -1,55 +1,43 @@
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 
--- UI Elements
 local ScreenGui = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
-local Title = Instance.new("TextLabel")
 local TextBox = Instance.new("TextBox")
 local TextButton = Instance.new("TextButton")
 
 ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Frame Setup (Smaller Size)
+-- Frame size adjustment
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
-Frame.Position = UDim2.new(0.5, -100, 0.5, -75)
-Frame.Size = UDim2.new(0, 200, 0, 150) -- Reduced size
+Frame.Position = UDim2.new(0.5, -80, 0.5, -40)  -- Frame size is slightly reduced
+Frame.Size = UDim2.new(0, 160, 0, 80)  -- Frame size is slightly reduced
 Frame.Active = true
 Frame.Draggable = true
 
--- Title Label (FainLord)
-Title.Parent = Frame
-Title.BackgroundTransparency = 1
-Title.Size = UDim2.new(1, 0, 0.2, 0)
-Title.Font = Enum.Font.SourceSansBold
-Title.Text = "FainLord"
-Title.TextColor3 = Color3.fromRGB(255, 255, 0) -- Yellow Text
-Title.TextSize = 24
-
--- TextBox Setup (Name Entry, Blue Background)
+-- TextBox setup
 TextBox.Parent = Frame
-TextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 255) -- Blue background
-TextBox.Position = UDim2.new(0.1, 0, 0.25, 0)
+TextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 255)  -- Change background color to blue
+TextBox.Position = UDim2.new(0.1, 0, 0.2, 0)
 TextBox.Size = UDim2.new(0.8, 0, 0.2, 0)
 TextBox.Font = Enum.Font.SourceSans
-TextBox.PlaceholderText = "နာမည်ထည့်မည်" -- Placeholder in Myanmar
+TextBox.PlaceholderText = "နာမည်ထည့်မည်"  -- Change placeholder text
 TextBox.Text = ""
-TextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Text color white
 TextBox.TextSize = 14
 
--- TextButton Setup (Green Background)
+-- TextButton setup
 TextButton.Parent = Frame
-TextButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Green background
+TextButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Change background color to green
 TextButton.Position = UDim2.new(0.1, 0, 0.5, 0)
 TextButton.Size = UDim2.new(0.8, 0, 0.4, 0)
 TextButton.Font = Enum.Font.SourceSans
-TextButton.Text = "လွှင့်ထွက်အောင်လုပ်မည်" -- Button label in Myanmar
-TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextButton.Text = "လွင့်ထွက်အောင်လုပ်မည်"  -- Change button text
+TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Text color white
 TextButton.TextSize = 20
 
--- GetPlayer Function: Finds the player using Username or Display Name
 local function GetPlayer(Name)
     Name = Name:lower()
     for _, x in next, Players:GetPlayers() do
@@ -62,46 +50,114 @@ local function GetPlayer(Name)
     return nil
 end
 
--- Message Function for Notifications
 local function Message(_Title, _Text, Time)
     game:GetService("StarterGui"):SetCore("SendNotification", {Title = _Title, Text = _Text, Duration = Time})
 end
 
--- SkidFling Function: Physically flings the target player
 local function SkidFling(TargetPlayer)
-    local character = Player.Character
-    local targetCharacter = TargetPlayer.Character
+    local Character = Player.Character
+    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+    local RootPart = Humanoid and Humanoid.RootPart
 
-    if character and targetCharacter then
-        -- HumanoidRootPart of both the Player and the Target
-        local hrp = character:FindFirstChild("HumanoidRootPart")
-        local targetHrp = targetCharacter:FindFirstChild("HumanoidRootPart")
+    local TCharacter = TargetPlayer.Character
+    local THumanoid = TCharacter and TCharacter:FindFirstChildOfClass("Humanoid")
+    local TRootPart = THumanoid and THumanoid.RootPart
+    local THead = TCharacter and TCharacter:FindFirstChild("Head")
+    local Accessory = TCharacter and TCharacter:FindFirstChildOfClass("Accessory")
+    local Handle = Accessory and Accessory:FindFirstChild("Handle")
 
-        if hrp and targetHrp then
-            -- BodyVelocity to apply force
-            local bodyVelocity = Instance.new("BodyVelocity")
-            bodyVelocity.Velocity = Vector3.new(10000, 10000, 10000) -- Adjust the force here
-            bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000) -- Maximum force allowed
-            bodyVelocity.Parent = hrp
-
-            -- Align Position to the target's root part
-            hrp.CFrame = targetHrp.CFrame -- Align the player to the target player
-
-            -- Apply force and fling
-            wait(0.1) -- Wait before removing force
-            bodyVelocity:Destroy() -- Remove the force after flinging
+    if Character and Humanoid and RootPart then
+        if RootPart.Velocity.Magnitude < 50 then
+            getgenv().OldPos = RootPart.CFrame
         end
-    end
-end
+        if THumanoid and THumanoid.Sit then
+            return Message("မှားနေသည်", "Target is sitting", 5)  -- Change error message
+        end
+        if THead then
+            workspace.CurrentCamera.CameraSubject = THead
+        elseif Handle then
+            workspace.CurrentCamera.CameraSubject = Handle
+        else
+            workspace.CurrentCamera.CameraSubject = THumanoid
+        end
+        if not TCharacter:FindFirstChildWhichIsA("BasePart") then
+            return
+        end
+        
+        local function FPos(BasePart, Pos, Ang)
+            RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+            Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+            RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+            RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+        end
+        
+        local function SFBasePart(BasePart)
+            local TimeToWait = 2
+            local Time = tick()
+            local Angle = 0
 
--- TextButton functionality
-TextButton.MouseButton1Click:Connect(function()
-    local targetName = TextBox.Text
-    local targetPlayer = GetPlayer(targetName)
+            repeat
+                if RootPart and THumanoid then
+                    if BasePart.Velocity.Magnitude < 50 then
+                        Angle = Angle + 100
 
-    if targetPlayer then
-        SkidFling(targetPlayer)
-    else
-        Message("မှားနေသည်", "နာမည်မှားနေသည်", 5) -- Error message in Myanmar
-    end
-end)
+                        FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle),0 ,0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(2.25, 1.5, -2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(-2.25, -1.5, 2.25) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection,CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection,CFrame.Angles(math.rad(Angle), 0, 0))
+                        task.wait()
+                    else
+                        FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, -THumanoid.WalkSpeed), CFrame.Angles(0, 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, 1.5, THumanoid.WalkSpeed), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+                        
+                        FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, -TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(0, 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, 1.5, TRootPart.Velocity.Magnitude / 1.25), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(math.rad(90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5 ,0), CFrame.Angles(math.rad(-90), 0, 0))
+                        task.wait()
+
+                        FPos(BasePart, CFrame.new(0, -1.5, 0), CFrame.Angles(0, 0, 0))
+                        task.wait()
+                    end
+                else
+                    break
+                end
+            until BasePart.Velocity.Magnitude > 500 or BasePart.Parent ~= TargetPlayer.Character or TargetPlayer.Parent ~= Players or not TargetPlayer.Character == TCharacter or THumanoid.Sit or Humanoid.Health <= 0 or tick() > Time + TimeToWait
+        end
+        
+        workspace.FallenPartsDestroyHeight = 0/0
+        
+        local BV = Instance.new("BodyVelocity")
+        BV.Name = "EpixVel"
+        BV.Parent = RootPart
+        BV.Velocity = Vector3.new(9e8, 9e8,
