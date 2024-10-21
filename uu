@@ -1,3 +1,5 @@
+-- player fling gui
+
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 
@@ -9,33 +11,30 @@ local TextButton = Instance.new("TextButton")
 ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Frame size adjustment
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
-Frame.Position = UDim2.new(0.5, -80, 0.5, -40)  -- Frame size is slightly reduced
-Frame.Size = UDim2.new(0, 160, 0, 80)  -- Frame size is slightly reduced
+Frame.Position = UDim2.new(0.5, -100, 0.5, -50)
+Frame.Size = UDim2.new(0, 200, 0, 100)
 Frame.Active = true
 Frame.Draggable = true
 
--- TextBox setup
 TextBox.Parent = Frame
-TextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 255)  -- Change background color to blue
+TextBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 TextBox.Position = UDim2.new(0.1, 0, 0.2, 0)
 TextBox.Size = UDim2.new(0.8, 0, 0.2, 0)
 TextBox.Font = Enum.Font.SourceSans
-TextBox.PlaceholderText = "နာမည်ထည့်မည်"  -- Change placeholder text
+TextBox.PlaceholderText = "Enter username"
 TextBox.Text = ""
-TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Text color white
+TextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 TextBox.TextSize = 14
 
--- TextButton setup
 TextButton.Parent = Frame
-TextButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  -- Change background color to green
+TextButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 TextButton.Position = UDim2.new(0.1, 0, 0.5, 0)
 TextButton.Size = UDim2.new(0.8, 0, 0.4, 0)
 TextButton.Font = Enum.Font.SourceSans
-TextButton.Text = "လွင့်ထွက်အောင်လုပ်မည်"  -- Change button text
-TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Text color white
+TextButton.Text = "FLING!"
+TextButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 TextButton.TextSize = 20
 
 local function GetPlayer(Name)
@@ -71,7 +70,7 @@ local function SkidFling(TargetPlayer)
             getgenv().OldPos = RootPart.CFrame
         end
         if THumanoid and THumanoid.Sit then
-            return Message("မှားနေသည်", "Target is sitting", 5)  -- Change error message
+            return Message("Error Occurred", "Target is sitting", 5)
         end
         if THead then
             workspace.CurrentCamera.CameraSubject = THead
@@ -160,4 +159,55 @@ local function SkidFling(TargetPlayer)
         local BV = Instance.new("BodyVelocity")
         BV.Name = "EpixVel"
         BV.Parent = RootPart
-        BV.Velocity = Vector3.new(9e8, 9e8,
+        BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
+        BV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
+        
+        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+        
+        if TRootPart and THead then
+            if (TRootPart.CFrame.p - THead.CFrame.p).Magnitude > 5 then
+                SFBasePart(THead)
+            else
+                SFBasePart(TRootPart)
+            end
+        elseif TRootPart and not THead then
+            SFBasePart(TRootPart)
+        elseif not TRootPart and THead then
+            SFBasePart(THead)
+        elseif not TRootPart and not THead and Accessory and Handle then
+            SFBasePart(Handle)
+        else
+            return Message("Error Occurred", "Target is missing everything", 5)
+        end
+        
+        BV:Destroy()
+        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+        workspace.CurrentCamera.CameraSubject = Humanoid
+        
+        repeat
+            RootPart.CFrame = getgenv().OldPos * CFrame.new(0, .5, 0)
+            Character:SetPrimaryPartCFrame(getgenv().OldPos * CFrame.new(0, .5, 0))
+            Humanoid:ChangeState("GettingUp")
+            table.foreach(Character:GetChildren(), function(_, x)
+                if x:IsA("BasePart") then
+                    x.Velocity, x.RotVelocity = Vector3.new(), Vector3.new()
+                end
+            end)
+            task.wait()
+        until (RootPart.Position - getgenv().OldPos.p).Magnitude < 25
+        workspace.FallenPartsDestroyHeight = getgenv().FPDH
+    else
+        return Message("Error Occurred", "Random error", 5)
+    end
+end
+
+TextButton.MouseButton1Click:Connect(function()
+    local targetName = TextBox.Text
+    local targetPlayer = GetPlayer(targetName)
+
+    if targetPlayer then
+        SkidFling(targetPlayer)
+    else
+        Message("Error Occurred", "Invalid username", 5)
+    end
+end)
