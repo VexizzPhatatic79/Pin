@@ -12,9 +12,9 @@ frame.Parent = screenGui
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 20)
 title.Position = UDim2.new(0, 0, 0, -20)
-title.Text = "Universal Key System Script"
+title.Text = "FainLord Key System "
 title.TextColor3 = Color3.new(1, 1, 1)
-title.BackgroundColor3 = Color3.new(0, 0, 0)
+title.BackgroundColor3 = Color3.new(255, 0, 0)
 title.Parent = frame
 
 local dragging
@@ -66,7 +66,7 @@ KeySystem.Position = UDim2.new(0, 0, 0, 0)
 KeySystem.Text = "Keyထည့်ပါ"
 KeySystem.TextColor3 = Color3.new(0, 0, 0)
 KeySystem.BackgroundTransparency = 0.5
-KeySystem.BackgroundColor3 = Color3.new(1, 1, 1)
+KeySystem.BackgroundColor3 = Color3.new(0, 255, 0)
 KeySystem.TextWrapped = true
 KeySystem.Parent = frame
 
